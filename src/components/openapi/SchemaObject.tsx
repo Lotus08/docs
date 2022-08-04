@@ -36,7 +36,9 @@ export default function SchemaObject({
   return (
     <div className="p-2">
       <p className="font-mono white break-all mb-0.5">
-        <span className="opacity-60">{objectParents.join('.') + '.'}</span>
+        {objectParents.length > 0 ? (
+          <span className="opacity-60">{objectParents.join('.') + '.'}</span>
+        ) : null}
         <span>{propertyName}</span>
         {required && <span className="text-red-500 mx-4 text-xs">required</span>}
       </p>
