@@ -29,6 +29,15 @@ const components = {
 };
 
 function MyApp({ Component, pageProps }: AppProps) {
+  // cheap way to redirect that's less anoying than the 404. Vercel doesn't like the redirect
+  // from / to /docs via next.config.js#redirects
+  if (typeof window !== 'undefined') {
+    if (window.location.pathname === '/') {
+      window.location.pathname = '/docs/';
+      return null;
+    }
+  }
+
   return (
     <>
       <MDXProvider components={components}>
