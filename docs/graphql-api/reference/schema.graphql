@@ -1,6 +1,5 @@
 schema {
   query: Query
-  mutation: Mutation
 }
 
 scalar JSON
@@ -118,121 +117,6 @@ type Query {
     "Filters based on the channel a notification belongs to."
     channels: [String!]
   ): DeliveryLogConnection @adminRequired
-  """
-  Fetch subscriptions
-  List of subscription records that belong to your project.
-
-  The project is determined by the HTTP authentication headers.
-  """
-  subscriptions(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: String
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: String
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-  ): SubscriptionsConnection @adminRequired
-}
-
-type Mutation {
-  """
-  Create subscription
-  Create a subscription record that belong to your project.
-
-  The project is determined by the HTTP authentication headers.
-  """
-  createSubscription(input: CreateSubscriptionInput!): CreateSubscriptionPayload!
-  """
-  Update a subscription
-  Update a subscription record that belong to your project.
-  """
-  updateSubscription(input: UpdateSubscriptionInput!): UpdateSubscriptionPayload
-  """
-  Delete a subscription
-  Delete a subscription record that belong to your project.
-  """
-  deleteSubscription(input: DeleteSubscriptionInput!): DeleteSubscriptionPayload
-  """
-  Update a user's subscription status to a topic
-  """
-  updateTopicSubscription(input: UpdateTopicSubscriptionInput!): UpdateTopicSubscriptionPayload
-  """
-  Delete a user's subscription to a topic
-  """
-  deleteTopicSubscription(input: DeleteTopicSubscriptionInput!): DeleteTopicSubscriptionPayload
-}
-
-input CreateSubscriptionInput {
-  "The subscription label. This is used on the unsubscribe page."
-  label: String
-
-  "The subscription slug, used for identification when performing CRUD operations on Topic Subscriptions"
-  slug: String
-
-  "The string that should be used to match against notification topics"
-  topic: String
-}
-
-input DeleteSubscriptionInput {
-  "The subscription id"
-  id: ID
-}
-
-input UpdateSubscriptionInput {
-  "The subscription id"
-  id: ID
-
-  "The subscription label. This is used on the unsubscribe page."
-  label: String
-
-  "The subscription slug, used for identification when performing CRUD operations on Topic Subscriptions"
-  slug: String
-
-  "The string that should be used to match against notification topics"
-  topic: String
-}
-
-input DeleteTopicSubscriptionInput {
-  "The user's email address"
-  email: String
-
-  "The user's external id"
-  externalId: String
-
-  "The associated subscription information"
-  subscription: SubscriptionInput
-}
-
-input UpdateTopicSubscriptionInput {
-  "The user's email address"
-  email: String
-
-  "The user's external id"
-  externalId: String
-
-  "Whether the user is subscribed/unsubscribed"
-  subscribed: Boolean
-
-  "The associated subscription information"
-  subscription: SubscriptionInput
-}
-
-input SubscriptionInput {
-  "The identifying subscription slug"
-  slug: String
 }
 
 type PageInfo {
@@ -288,38 +172,6 @@ type Notification {
   archivedAt: ISO8601DateTime
 }
 
-type SubscriptionsConnection {
-  "Total number of subscriptions"
-  totalCount: Int!
-
-  "A list of edges."
-  edges: [SubscriptionsEdge]
-
-  "Information to aid in pagination."
-  pageInfo: PageInfo!
-}
-
-type SubscriptionsEdge {
-  "A cursor for use in pagination."
-  cursor: String!
-
-  "The item at the end of the edge."
-  node: Subscription
-}
-
-type Subscription {
-  id: ID!
-  label: String
-  slug: String!
-  topic: String!
-}
-
-type TopicSubscription {
-  subscribed: Boolean
-  subscription: Subscription
-  user: User
-}
-
 type UsersConnection {
   "Total number of users."
   totalCount: Int!
@@ -348,7 +200,6 @@ type User {
   customAttributes: JSON
   phoneNumbers: JSON
   notifications: NotificationsConnection
-  topicSubscriptions: JSON
   lastSignInIp: String
   lastSeenAt: ISO8601DateTime
   createdAt: ISO8601DateTime!
@@ -446,29 +297,4 @@ type ChannelConfiguration {
 type ValidationError {
   location: [String!]
   message: String!
-}
-
-type CreateSubscriptionPayload {
-  errors: [ValidationError!]
-  subscription: Subscription
-}
-
-type UpdateSubscriptionPayload {
-  errors: [ValidationError!]
-  subscription: Subscription
-}
-
-type DeleteSubscriptionPayload {
-  errors: [ValidationError!]
-  subscription: Subscription
-}
-
-type DeleteTopicSubscriptionPayload {
-  errors: [ValidationError!]
-  userSubscription: TopicSubscription
-}
-
-type UpdateTopicSubscriptionPayload {
-  errors: [ValidationError!]
-  userSubscription: TopicSubscription
 }
