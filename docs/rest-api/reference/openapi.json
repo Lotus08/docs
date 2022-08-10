@@ -1404,7 +1404,7 @@
                   "type": "object",
                   "properties": {
                     "subscription": {
-                      "$ref": "#/components/schemas/UpdatedTopicSubscription"
+                      "$ref": "#/components/schemas/TopicSubscription"
                     }
                   }
                 },
@@ -1490,7 +1490,7 @@
                   "type": "object",
                   "properties": {
                     "topic_subscription": {
-                      "$ref": "#/components/schemas/UpdatedTopicSubscription"
+                      "$ref": "#/components/schemas/TopicSubscription"
                     }
                   }
                 },
@@ -1571,7 +1571,7 @@
                   "type": "object",
                   "properties": {
                     "topic_subscription": {
-                      "$ref": "#/components/schemas/UpdatedTopicSubscription"
+                      "$ref": "#/components/schemas/TopicSubscription"
                     }
                   }
                 },
@@ -2055,7 +2055,7 @@
               },
               "topic": {
                 "type": "string",
-                "description": "The topic the user should be subscribed to"
+                "description": "The topic the user should be subscribed to. If the topic does not exist it will be created."
               }
             },
             "required": ["categories", "topic"]
@@ -2090,44 +2090,38 @@
           }
         }
       },
-      "UpdatedTopicSubscription": {
+      "TopicSubscription": {
         "type": "object",
         "properties": {
-          "subscribed": {
-            "type": "boolean",
-            "description": "Whether the user should be subscribed/unsubscribed"
-          },
-          "user": { "$ref": "#/components/schemas/SubscriptionUser" },
-          "subscription": { "$ref": "#/components/schemas/Subscription" }
-        }
-      },
-      "Subscription": {
-        "type": "object",
-        "properties": {
-          "label": {
-            "type": "string",
-            "description": "Whether the user should be subscribed/unsubscribed"
-          },
-          "slug": {
-            "type": "string",
-            "description": "Whether the user should be subscribed/unsubscribed"
-          },
-          "topic": {
-            "type": "string",
-            "description": "Whether the user should be subscribed/unsubscribed"
-          }
-        }
-      },
-      "SubscriptionUser": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "description": "Whether the user should be subscribed/unsubscribed"
-          },
-          "id": {
-            "type": "string",
-            "description": "Whether the user should be subscribed/unsubscribed"
+          "subscription": {
+            "type": "object",
+            "properties": {
+              "categories": {
+                "type": "array",
+                "description": "A list of hashes containing the category slug and the reason for the subscription",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string",
+                      "description": "The slug of the category to be subscribed to. * can also be be specified if the subscription should match all categories"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "The reason for the subscription"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "The status of the topic subscription"
+                    }
+                  }
+                }
+              },
+              "topic": {
+                "type": "string",
+                "description": "The topic the user should be subscribed to. If the topic does not exist it will be created."
+              }
+            }
           }
         }
       },
