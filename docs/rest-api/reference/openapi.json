@@ -1285,12 +1285,92 @@
         }
       }
     },
-    "/topic_subscriptions": {
-      "post": {
-        "operationId": "update-topic-subscription",
+    "/subscriptions": {
+      "get": {
+        "operationId": "list-topic-subscription",
         "tags": ["Subscription API"],
-        "summary": "Update a user's topic subscription status",
-        "description": "Set a user's subscription status to subscribed or unsubscribed for a particular subscription topic.",
+        "summary": "List subscriptions",
+        "description": "List a user's subscriptions status for all topics and categories.",
+        "parameters": [
+          { "$ref": "#/components/parameters/x_magicbell_api_key_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_external_id_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_email_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_hmac_header" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subscriptions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "categories": {
+                            "type": "array",
+                            "description": "A list of hashes containing the category slug and the reason for the subscription",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "slug": {
+                                  "type": "string",
+                                  "description": "The slug of the category to be subscribed to. * can also be be specified if the subscription should match all categories"
+                                },
+                                "reason": {
+                                  "type": "string",
+                                  "description": "The reason for the subscription"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "subscriptions": [
+                    {
+                      "categories": [
+                        {
+                          "slug": "updates",
+                          "reason": "watching-the-order",
+                          "status": "unsubscribed"
+                        },
+                        {
+                          "slug": "comments",
+                          "reason": "watching-the-order",
+                          "status": "unsubscribed"
+                        }
+                      ],
+                      "topic": "acme-inc.orders.1234"
+                    },
+                    {
+                      "categories": [
+                        {
+                          "slug": "comments",
+                          "reason": "watching-the-order",
+                          "status": "unsubscribed"
+                        }
+                      ],
+                      "topic": "acme-inc.orders.2345"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "create-topic-subscription",
+        "tags": ["Subscription API"],
+        "summary": "Create a topic subscription",
+        "description": "Set a user's subscription status to subscribed for a particular topic (and optional categories).",
         "parameters": [
           { "$ref": "#/components/parameters/x_magicbell_api_key_header" },
           { "$ref": "#/components/parameters/x_magicbell_user_external_id_header" },
@@ -1300,13 +1380,16 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/TopicSubscriptionBody" },
+              "schema": { "$ref": "#/components/schemas/SubscriptionBody" },
               "example": {
-                "topic_subscription": {
-                  "subscribed": false,
-                  "subscription": {
-                    "slug": "acme-inc.orders.1234"
-                  }
+                "subscription": {
+                  "categories": [
+                    {
+                      "slug": "comments",
+                      "reason": "watching-the-repo"
+                    }
+                  ],
+                  "topic": "acme-inc.orders.1234"
                 }
               }
             }
@@ -1320,17 +1403,21 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "topic_subscription": {
+                    "subscription": {
                       "$ref": "#/components/schemas/UpdatedTopicSubscription"
                     }
                   }
                 },
                 "example": {
-                  "topic_subscription": {
-                    "subscribed": false,
-                    "subscription": {
-                      "slug": "acme-inc.orders.1234"
-                    }
+                  "subscription": {
+                    "categories": [
+                      {
+                        "slug": "comments",
+                        "reason": "watching-the-repo",
+                        "status": "subscribed"
+                      }
+                    ],
+                    "topic": "acme-inc.orders.1234"
                   }
                 }
               }
@@ -1352,10 +1439,10 @@
                 "example": {
                   "errors": [
                     {
-                      "message": "Param 'topic_subscription.subscription' is missing"
+                      "message": "Param 'subscription.topic' is missing"
                     },
                     {
-                      "message": "Param 'topic_subscription.subscribed' is missing"
+                      "message": "Param 'subscription.categories' is missing"
                     }
                   ]
                 }
@@ -1365,18 +1452,203 @@
         }
       }
     },
-    "/topic_subscriptions/{subscription_slug}": {
-      "delete": {
-        "operationId": "delete-topic-subscription",
+    "/subscriptions/{topic}/unsubscribe": {
+      "post": {
+        "operationId": "unsubscribe-topic-subscription",
         "tags": ["Subscription API"],
-        "summary": "Delete a user's topic subscription",
+        "summary": "Unsubscribe from a topic",
+        "description": "Unusbscribe a user from a particular topic (and optional categories).",
         "parameters": [
           { "$ref": "#/components/parameters/x_magicbell_api_key_header" },
           { "$ref": "#/components/parameters/x_magicbell_user_external_id_header" },
           { "$ref": "#/components/parameters/x_magicbell_user_email_header" },
           { "$ref": "#/components/parameters/x_magicbell_user_hmac_header" },
-          { "$ref": "#/components/parameters/subscription_slug" }
+          { "$ref": "#/components/parameters/topic_subscription_query_param" }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UnsubscriptionBody" },
+              "example": {
+                "subscription": {
+                  "categories": [
+                    {
+                      "slug": "comments"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "topic_subscription": {
+                      "$ref": "#/components/schemas/UpdatedTopicSubscription"
+                    }
+                  }
+                },
+                "example": {
+                  "subscription": {
+                    "categories": [
+                      {
+                        "slug": "comments",
+                        "reason": "watching-the-repo",
+                        "status": "unsubscribed"
+                      }
+                    ],
+                    "topic": "acme-inc.orders.1234"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Topic subscription not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "errors": [
+                    {
+                      "message": "Couldn't find a user's subscription matching the criteria"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "description": "List of validation errors"
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "message": "Param 'subscription.categories' is missing"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{topic}": {
+      "get": {
+        "operationId": "show-topic-subscription",
+        "tags": ["Subscription API"],
+        "summary": "Show a topic subscription",
+        "description": "Show a user's subscription status for a particular topic and categories.",
+        "parameters": [
+          { "$ref": "#/components/parameters/x_magicbell_api_key_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_external_id_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_email_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_hmac_header" },
+          { "$ref": "#/components/parameters/topic_subscription_query_param" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "topic_subscription": {
+                      "$ref": "#/components/schemas/UpdatedTopicSubscription"
+                    }
+                  }
+                },
+                "example": {
+                  "subscription": {
+                    "categories": [
+                      {
+                        "slug": "comments",
+                        "reason": "watching-the-repo",
+                        "status": "unsubscribed"
+                      }
+                    ],
+                    "topic": "acme-inc.orders.1234"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errors": {
+                      "type": "array",
+                      "description": "List of validation errors"
+                    }
+                  }
+                },
+                "example": {
+                  "errors": [
+                    {
+                      "message": "Couldn't find topic: comments"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-topic-subscription",
+        "tags": ["Subscription API"],
+        "summary": "Delete topic subscription(s)",
+        "parameters": [
+          { "$ref": "#/components/parameters/x_magicbell_api_key_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_external_id_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_email_header" },
+          { "$ref": "#/components/parameters/x_magicbell_user_hmac_header" },
+          { "$ref": "#/components/parameters/topic_subscription_query_param" }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "categories": {
+                    "type": "array",
+                    "description": "A list of hashes containing the category slug and the reason for the subscription. Omiting categories deletes all topic subscriptions beloning to the topic.",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "slug": {
+                          "type": "string",
+                          "description": "The slug of the category to be subscribed to. * can also be be specified if the subscription should match all categories"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "204": { "description": "Topic subscription delete successfully" },
           "404": {
@@ -1505,6 +1777,14 @@
           }
         },
         "description": "A filter on the notifications based on the topic."
+      },
+      "topic_subscription_query_param": {
+        "in": "query",
+        "name": "topic",
+        "schema": {
+          "type": "string"
+        },
+        "description": "The topic for which we'd like to filter topic subscriptions."
       }
     },
     "schemas": {
@@ -1750,29 +2030,65 @@
           "notification": { "$ref": "#/components/schemas/Notification" }
         }
       },
-      "TopicSubscriptionBody": {
+      "SubscriptionBody": {
         "type": "object",
         "properties": {
-          "topic_subscription": {
+          "subscription": {
             "type": "object",
             "properties": {
-              "subscription": {
-                "type": "object",
-                "properties": {
-                  "slug": {
-                    "type": "string",
-                    "description": "The slug of the subscription to be updated"
+              "categories": {
+                "type": "array",
+                "description": "A list of hashes containing the category slug and the reason for the subscription",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string",
+                      "description": "The slug of the category to be subscribed to. * can also be be specified if the subscription should match all categories"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "The reason for the subscription"
+                    }
                   }
                 }
               },
-              "subscribed": {
-                "type": "boolean",
-                "description": "Whether the user should be subscribed/unsubscribed"
+              "topic": {
+                "type": "string",
+                "description": "The topic the user should be subscribed to"
               }
-            }
+            },
+            "required": ["categories", "topic"]
           }
-        },
-        "required": ["subscription", "subscribed"]
+        }
+      },
+      "UnsubscriptionBody": {
+        "type": "object",
+        "properties": {
+          "subscription": {
+            "type": "object",
+            "properties": {
+              "categories": {
+                "type": "array",
+                "description": "A list of hashes containing the category slug and the reason for the subscription",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string",
+                      "description": "The slug of the category to be subscribed to. * can also be be specified if the subscription should match all categories"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "description": "The reason for the subscription"
+                    }
+                  }
+                }
+              }
+            },
+            "required": ["categories"]
+          }
+        }
       },
       "UpdatedTopicSubscription": {
         "type": "object",
