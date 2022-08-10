@@ -38,13 +38,13 @@ The `{ "topic": { "subscribers": true } }` recipient can be used to send notific
 
 ## How this all works
 
-1. When a user subscribes to a topic in your app, a subscription record is created with the status `subscribed`. You can update subscription status using either our [REST API](/docs/rest-api/reference#update-topic-subscription) or [GraphQL API](/docs/graphql-api/reference#update-a-user's-subscription-status-to-a-topic).
+1. When a user subscribes to a topic in your app, a subscription record is created with the status `subscribed`. You can [unsubscribe](/docs/rest-api/reference#unsubscribe-topic-subscription) and [resubscribe](/docs/rest-api/reference#create-topic-subscription) the user using the REST API.
 1. Our backend [creates the subscription](/docs/graphql-api/reference#create-subscription).
-1. Whenever a topic is specified in a notification, the user will receive the notification.
+1. Whenever a matching category & topic is used in a notification, the user will receive the notification.
 
 ## How users can unsubscribe
 
-When sending a notification you can use the `{{ unsubscribe_url }}` merge tag to generate a URL for the specific recipient and the notification's topic — this can be used in [templates](/docs/templates), [email layout](/docs/email-layouts), and in notification content.
+When sending a notification you can use the `{{ unsubscribe_url }}` merge tag to generate a URL for the specific recipient and the notification's topic — this can be used in [templates](/docs/templates), [email layout](/docs/email-layouts), and in notification content. When the unsubscribe link requires the category as well use `{{ unsubscribe_url | category: "current" }}`.
 
 As we don't generate unsubscribe URLs when a topic isn't specified for a notification, consider using [control flow](https://shopify.github.io/liquid/tags/control-flow/) to avoid an empty object being rendered in your notification:
 

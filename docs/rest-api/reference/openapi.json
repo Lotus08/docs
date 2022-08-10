@@ -1370,7 +1370,7 @@
         "operationId": "create-topic-subscription",
         "tags": ["Subscription API"],
         "summary": "Create a topic subscription",
-        "description": "Set a user's subscription status to subscribed for a particular topic (and optional categories).",
+        "description": "Set a user's subscription status to subscribed for a particular topic (and optional categories). If the user previously unsubscribed, the user will be resubscribed.",
         "parameters": [
           { "$ref": "#/components/parameters/x_magicbell_api_key_header" },
           { "$ref": "#/components/parameters/x_magicbell_user_external_id_header" },
