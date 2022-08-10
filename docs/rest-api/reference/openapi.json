@@ -1380,7 +1380,7 @@
         "requestBody": {
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SubscriptionBody" },
+              "schema": { "$ref": "#/components/schemas/TopicSubscriptionBody" },
               "example": {
                 "subscription": {
                   "categories": [
@@ -1717,13 +1717,6 @@
         "required": true,
         "description": "ID of the user notification.\nThe ID of a user notification can be obtained from the \"Fetch user notifications\" API endpoint or from push events sent to the MagicBell React library.\n"
       },
-      "subscription_slug": {
-        "in": "path",
-        "name": "subscription_slug",
-        "schema": { "type": "string" },
-        "required": true,
-        "description": "The slug of the Subscription."
-      },
       "workspace_id": {
         "in": "path",
         "name": "workspace_id",
@@ -2030,7 +2023,7 @@
           "notification": { "$ref": "#/components/schemas/Notification" }
         }
       },
-      "SubscriptionBody": {
+      "TopicSubscriptionBody": {
         "type": "object",
         "properties": {
           "subscription": {
